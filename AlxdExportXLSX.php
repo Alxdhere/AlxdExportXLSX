@@ -47,6 +47,18 @@ class AlxdExportXLSX
         if (file_exists($this->baseFullFilename))
             unlink($this->baseFullFilename);
     }
+    
+    private function numToLetter($num)
+    {
+        $f = '';
+        do
+        {
+            $f = chr(64 + $num % 26) . $f;
+            $num = floor($num / 26);
+        }
+        while ($num > 0);
+        return $f;
+    }
 
     public function getColCount()
     {
@@ -78,7 +90,7 @@ class AlxdExportXLSX
 
         $this->workSheetHandler = fopen($this->baseDir.'/xl/worksheets/sheet1.xml', 'w+');
 
-        fwrite($this->workSheetHandler, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:'.chr(64+$this->colCount).$this->rowCount.'"/><sheetData>');
+        fwrite($this->workSheetHandler, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:'.$this->numToLetter($this->colCount).$this->rowCount.'"/><sheetData>');
     }
 
     public function resetRow()
@@ -108,7 +120,7 @@ class AlxdExportXLSX
     public function appendCellNum($value)
     {
         $this->curCel++;
-        $this->currentRow[] = '<c r="'.chr(64+$this->curCel).$this->numRows.'"><v>'.$value.'</v></c>';
+        $this->currentRow[] = '<c r="'.$this->numToLetter($this->curCel).$this->numRows.'"><v>'.$value.'</v></c>';
     }
 
     public function appendCellString($value)
@@ -117,7 +129,7 @@ class AlxdExportXLSX
         if (!empty($value)) {
             $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
             $value = preg_replace( '/[\x00-\x13]/', '', $value );
-            $this->currentRow[] = '<c r="'.chr(64+$this->curCel).$this->numRows.'" t="inlineStr"'.($this->isBold ? ' s="7"' : '').'><is><t>'.$value.'</t></is></c>';
+            $this->currentRow[] = '<c r="'.$this->numToLetter($this->curCel).$this->numRows.'" t="inlineStr"'.($this->isBold ? ' s="7"' : '').'><is><t>'.$value.'</t></is></c>';
             $this->numStrings++;
         }
     }
@@ -137,7 +149,7 @@ class AlxdExportXLSX
         {
             $dt = new DateTime($value);
             $ts = $dt->getTimestamp() + self::ZERO_TIMESTAMP;
-            $this->currentRow[] = '<c r="'.chr(64+$this->curCel).$this->numRows.'" s="1"><v>'.$ts/self::SEC_IN_DAY.'</v></c>';
+            $this->currentRow[] = '<c r="'.$this->numToLetter($this->curCel).$this->numRows.'" s="1"><v>'.$ts/self::SEC_IN_DAY.'</v></c>';
         }
     }
 
@@ -151,7 +163,7 @@ class AlxdExportXLSX
         {
             $dt = new DateTime($value);
             $ts = $dt->getTimestamp() + self::ZERO_TIMESTAMP;
-            $this->currentRow[] = '<c r="'.chr(64+$this->curCel).$this->numRows.'" s="2"><v>'.floor($ts/self::SEC_IN_DAY).'</v></c>';
+            $this->currentRow[] = '<c r="'.$this->numToLetter($this->curCel).$this->numRows.'" s="2"><v>'.floor($ts/self::SEC_IN_DAY).'</v></c>';
         }
     }
 
@@ -165,7 +177,7 @@ class AlxdExportXLSX
         {
             $dt = new DateTime($value);
             $ts = $dt->getTimestamp() + self::ZERO_TIMESTAMP;
-            $this->currentRow[] = '<c r="'.chr(64+$this->curCel).$this->numRows.'" s="3"><v>'.($ts/self::SEC_IN_DAY - floor($ts/self::SEC_IN_DAY)).'</v></c>';
+            $this->currentRow[] = '<c r="'.$this->numToLetter($this->curCel).$this->numRows.'" s="3"><v>'.($ts/self::SEC_IN_DAY - floor($ts/self::SEC_IN_DAY)).'</v></c>';
         }
     }
 
